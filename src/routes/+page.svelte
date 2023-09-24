@@ -1,5 +1,5 @@
 <script>
-	const jokeTypes = ['Programming', 'Dark'];
+	const jokeTypes = ['Programming', 'Dark', 'Misc', 'Pun', 'Spooky', 'Christmas'];
 
 	/**
 	 * @type {string[]}
@@ -50,7 +50,7 @@
 
 	{#if jokes.length > 0}
 		{#each jokes as joke, i}
-			<h4>Joke {i + 1}</h4>
+			<h4>Joke #{i + 1}:</h4>
 			<div>
 				{#if joke.type === 'single'}
 					<p>{joke.joke}</p>
