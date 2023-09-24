@@ -1,59 +1,96 @@
 <script>
-	import Counter from './Counter.svelte';
-	import welcome from '$lib/images/svelte-welcome.webp';
-	import welcome_fallback from '$lib/images/svelte-welcome.png';
+	const jokeTypes = ['Programming', 'Dark'];
+
+	/**
+	 * @type {string[]}
+	 */
+	let selectedTypes = [];
+	let amount = 1;
+
+	/**
+	 * @type {string | any[]}
+	 */
+	let jokes = [];
+
+	async function fetchJokes() {
+		const apiUrl = `https://v2.jokeapi.dev/joke/${selectedTypes.join()}?amount=${Math.abs(amount)}`;
+		const res = await fetch(apiUrl);
+		const data = await res.json();
+		jokes = [...data.jokes];
+	}
 </script>
 
 <svelte:head>
 	<title>Home</title>
-	<meta name="description" content="Svelte demo app" />
+	<meta name="description" content="Tell me a joke!" />
 </svelte:head>
 
 <section>
-	<h1>
-		<span class="welcome">
-			<picture>
-				<source srcset={welcome} type="image/webp" />
-				<img src={welcome_fallback} alt="Welcome" />
-			</picture>
-		</span>
+	<div>
+		<h1>Welcome to this silly app!</h1>
 
-		to your new<br />SvelteKit app
-	</h1>
+		<h2>Choose the type of joke you want to hear, and then click the button!</h2>
+	</div>
 
-	<h2>
-		try editing <strong>src/routes/+page.svelte</strong>
-	</h2>
+	<div class="options">
+		{#each jokeTypes as type}
+			<label>
+				<input type="checkbox" name="jokeTypes" value={type} bind:group={selectedTypes} />
+				{type}
+			</label>
+		{/each}
 
-	<Counter />
+		<label>
+			<input type="number" id="amount" name="amount" bind:value={amount} />
+			Select how many jokes do you want.
+		</label>
+	</div>
+
+	<button on:click={fetchJokes}>Fetch!</button>
+
+	{#if jokes.length > 0}
+		{#each jokes as joke, i}
+			<h4>Joke {i + 1}</h4>
+			<div>
+				{#if joke.type === 'single'}
+					<p>{joke.joke}</p>
+				{:else}
+					<p><strong>Setup:</strong> {joke.setup}</p>
+					<p><strong>Delivery:</strong> {joke.delivery}</p>
+				{/if}
+			</div>
+		{/each}
+	{/if}
 </section>
 
 <style>
 	section {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		flex: 0.6;
+		width: 66ch;
+		margin: 0 auto;
 	}
 
 	h1 {
 		width: 100%;
 	}
 
-	.welcome {
-		display: block;
-		position: relative;
-		width: 100%;
-		height: 0;
-		padding: 0 0 calc(100% * 495 / 2048) 0;
+	h2 {
+		font-size: 1.2rem;
 	}
 
-	.welcome img {
-		position: absolute;
-		width: 100%;
-		height: 100%;
-		top: 0;
-		display: block;
+	.options {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.options input {
+		margin-right: 0.5rem;
+		font-size: 2rem;
+		margin-bottom: 0.5rem;
+	}
+
+	#amount {
+		font-size: 1.2rem;
+		width: 50px;
+		margin: 1rem 0.5rem 1rem 0;
 	}
 </style>
